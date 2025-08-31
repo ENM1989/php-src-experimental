@@ -4585,7 +4585,37 @@ PHP_FUNCTION(array_values)
 		RETURN_COPY(input);
 	}
 
-	RETURN_ARR(zend_array_to_list(arrval));
+	zend_array *result = zend_new_array(arrlen);
+	zend_hash_real_init_packed(result);
+
+	ZEND_HASH_FILL_PACKED(result) {
+		zval *entry;
+		if (HT_IS_PACKED(arrval)) {
+			zval *p, *end;
+			for (p = arrval->arPacked, end = p + arrval->nNumUsed; p < end; p++) {
+				if (Z_TYPE_P(p) == IS_UNDEF) continue;
+				entry = p;
+				if (UNEXPECTED(Z_ISREF_P(entry) && Z_REFCOUNT_P(entry) == 1)) {
+					entry = Z_REFVAL_P(entry);
+				}
+				Z_TRY_ADDREF_P(entry);
+				ZEND_HASH_FILL_ADD(entry);
+			}
+		} else {
+			Bucket *p, *end;
+			for (p = arrval->arData, end = p + arrval->nNumUsed; p < end; p++) {
+				if (Z_TYPE_P(&p->val) == IS_UNDEF) continue;
+				entry = &p->val;
+				if (UNEXPECTED(Z_ISREF_P(entry) && Z_REFCOUNT_P(entry) == 1)) {
+					entry = Z_REFVAL_P(entry);
+				}
+				Z_TRY_ADDREF_P(entry);
+				ZEND_HASH_FILL_ADD(entry);
+			}
+		}
+	} ZEND_HASH_FILL_END();
+
+	RETURN_ARR(result);
 }
 /* }}} */
 
