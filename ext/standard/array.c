@@ -2853,7 +2853,7 @@ PHP_FUNCTION(array_fill_keys)
 				__exceed_by, end, start, (_step), (double)HT_MAX_SIZE); \
 			RETURN_THROWS(); \
 		} \
-		size = (uint32_t)_php_math_round(__calc_size, 0, PHP_ROUND_HALF_UP); \
+		size = (uint32_t)floor(__calc_size + 0.0000000001); \
 		array_init_size(return_value, size); \
 		zend_hash_real_init_packed(Z_ARRVAL_P(return_value)); \
 	} while (0)
@@ -3119,9 +3119,8 @@ PHP_FUNCTION(range)
 			element = start_double;
 			ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(return_value)) {
 				for (i = 0; i < size; i++) {
-					ZEND_HASH_FILL_SET_DOUBLE(element);
+					ZEND_HASH_FILL_SET_DOUBLE(start_double - i * step_double);
 					ZEND_HASH_FILL_NEXT();
-					element -= step_double;
 				}
 			} ZEND_HASH_FILL_END();
 		} else if (end_double > start_double) { /* Increasing float range */
@@ -3137,9 +3136,8 @@ PHP_FUNCTION(range)
 			element = start_double;
 			ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(return_value)) {
 				for (i = 0; i < size; i++) {
-					ZEND_HASH_FILL_SET_DOUBLE(element);
+					ZEND_HASH_FILL_SET_DOUBLE(start_double + i * step_double);
 					ZEND_HASH_FILL_NEXT();
-					element += step_double;
 				}
 			} ZEND_HASH_FILL_END();
 		} else {
@@ -4880,14 +4878,33 @@ PHP_FUNCTION(array_flip)
 	zval *array, *entry, data;
 	zend_ulong num_idx;
 	zend_string *str_idx;
+	HashTable *ht;
 
 	ZEND_PARSE_PARAMETERS_START(1, 1)
 		Z_PARAM_ARRAY(array)
 	ZEND_PARSE_PARAMETERS_END();
 
-	array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(array)));
+	ht = Z_ARRVAL_P(array);
+	array_init_size(return_value, zend_hash_num_elements(ht));
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), num_idx, str_idx, entry) {
+	if (HT_IS_PACKED(ht) && ht->nNumUsed == ht->nNumOfElements) {
+		uint32_t i;
+		for (i = 0; i < ht->nNumUsed; i++) {
+			entry = &ht->arPacked[i];
+			if (Z_TYPE_P(entry) == IS_LONG) {
+				ZVAL_LONG(&data, i);
+				zend_hash_index_update(Z_ARRVAL_P(return_value), Z_LVAL_P(entry), &data);
+			} else if (Z_TYPE_P(entry) == IS_STRING) {
+				ZVAL_LONG(&data, i);
+				zend_symtable_update(Z_ARRVAL_P(return_value), Z_STR_P(entry), &data);
+			} else {
+				php_error_docref(NULL, E_WARNING, "Can only flip string and integer values, entry skipped");
+			}
+		}
+		return;
+	}
+
+	ZEND_HASH_FOREACH_KEY_VAL(ht, num_idx, str_idx, entry) {
 		ZVAL_DEREF(entry);
 		if (Z_TYPE_P(entry) == IS_LONG) {
 			if (str_idx) {
