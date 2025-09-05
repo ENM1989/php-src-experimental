@@ -189,6 +189,28 @@ PHP_HASH_API void PHP_SNEFRUFinal(unsigned char digest[32], PHP_SNEFRU_CTX *cont
 	ZEND_SECURE_ZERO(context, sizeof(*context));
 }
 
+PHP_HASH_API void PHP_SNEFRU128Final(unsigned char digest[16], PHP_SNEFRU_CTX *context)
+{
+	uint32_t i, j;
+
+	if (context->length) {
+		SnefruTransform(context, context->buffer);
+	}
+
+	context->state[14] = context->count[0];
+	context->state[15] = context->count[1];
+	Snefru(context->state);
+
+	for (i = 0, j = 0; j < 16; i++, j += 4) {
+		digest[j] = (unsigned char) ((context->state[i] >> 24) & 0xff);
+		digest[j + 1] = (unsigned char) ((context->state[i] >> 16) & 0xff);
+		digest[j + 2] = (unsigned char) ((context->state[i] >> 8) & 0xff);
+		digest[j + 3] = (unsigned char) (context->state[i] & 0xff);
+	}
+
+	ZEND_SECURE_ZERO(context, sizeof(*context));
+}
+
 static hash_spec_result php_snefru_unserialize(php_hashcontext_object *hash, zend_long magic, const zval *zv)
 {
 	PHP_SNEFRU_CTX *ctx = (PHP_SNEFRU_CTX *) hash->context;
@@ -212,6 +234,21 @@ const php_hash_ops php_hash_snefru_ops = {
 	php_snefru_unserialize,
 	PHP_SNEFRU_SPEC,
 	32,
+	32,
+	sizeof(PHP_SNEFRU_CTX),
+	1
+};
+
+const php_hash_ops php_hash_snefru128_ops = {
+	"snefru128",
+	(php_hash_init_func_t) PHP_SNEFRUInit,
+	(php_hash_update_func_t) PHP_SNEFRUUpdate,
+	(php_hash_final_func_t) PHP_SNEFRU128Final,
+	php_hash_copy,
+	php_hash_serialize,
+	php_snefru_unserialize,
+	PHP_SNEFRU_SPEC,
+	16,
 	32,
 	sizeof(PHP_SNEFRU_CTX),
 	1

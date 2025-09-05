@@ -31,6 +31,7 @@
 #include "zend_smart_str.h"
 
 #include "hash_arginfo.h"
+#include "php_hash_snefru.h"
 
 #ifdef PHP_WIN32
 # define __alignof__ __alignof
@@ -81,7 +82,7 @@ static struct mhash_bc_entry mhash_to_hash[MHASH_NUM_ALGOS] = {
 	{"RIPEMD128", "ripemd128", 23},
 	{"RIPEMD256", "ripemd256", 24},
 	{"RIPEMD320", "ripemd320", 25},
-	{NULL, NULL, 26}, /* support needs to be added for snefru 128 */
+	{"SNEFRU128", "snefru128", 26},
 	{"SNEFRU256", "snefru256", 27},
 	{"MD2", "md2", 28},
 	{"FNV132", "fnv132", 29},
@@ -1606,6 +1607,7 @@ PHP_MINIT_FUNCTION(hash)
 	php_hash_register_algo("tiger160,4",	&php_hash_4tiger160_ops);
 	php_hash_register_algo("tiger192,4",	&php_hash_4tiger192_ops);
 	php_hash_register_algo("snefru",		&php_hash_snefru_ops);
+	php_hash_register_algo("snefru128",		&php_hash_snefru128_ops);
 	php_hash_register_algo("snefru256",		&php_hash_snefru_ops);
 	php_hash_register_algo("gost",			&php_hash_gost_ops);
 	php_hash_register_algo("gost-crypto",		&php_hash_gost_crypto_ops);

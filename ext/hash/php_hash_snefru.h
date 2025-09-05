@@ -33,5 +33,8 @@ typedef struct {
 PHP_HASH_API void PHP_SNEFRUInit(PHP_SNEFRU_CTX *, ZEND_ATTRIBUTE_UNUSED HashTable *);
 PHP_HASH_API void PHP_SNEFRUUpdate(PHP_SNEFRU_CTX *, const unsigned char *, size_t);
 PHP_HASH_API void PHP_SNEFRUFinal(unsigned char[32], PHP_SNEFRU_CTX *);
+PHP_HASH_API void PHP_SNEFRU128Final(unsigned char[16], PHP_SNEFRU_CTX *);
+
+extern const php_hash_ops php_hash_snefru128_ops;
 
 #endif

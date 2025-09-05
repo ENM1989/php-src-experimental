@@ -77,6 +77,8 @@ string(10) "tiger192,4"
 HashContext with HASH_HMAC option cannot be serialized
 string(6) "snefru"
 HashContext with HASH_HMAC option cannot be serialized
+string(9) "snefru128"
+HashContext with HASH_HMAC option cannot be serialized
 string(9) "snefru256"
 HashContext with HASH_HMAC option cannot be serialized
 string(4) "gost"
