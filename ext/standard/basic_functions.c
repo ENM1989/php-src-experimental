@@ -215,6 +215,38 @@ static void php_putenv_destructor(zval *zv) /* {{{ */
 /* }}} */
 #endif
 
+/* {{{ Repeats a function N times */
+PHP_FUNCTION(repeat)
+{
+	zend_long times;
+	zend_fcall_info fci;
+	zend_fcall_info_cache fci_cache;
+	zval retval;
+	zval params[1];
+
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_LONG(times)
+		Z_PARAM_FUNC(fci, fci_cache)
+	ZEND_PARSE_PARAMETERS_END();
+
+	if (times <= 0) {
+		return;
+	}
+
+	fci.retval = &retval;
+	fci.param_count = 1;
+	fci.params = params;
+
+	for (zend_long i = 0; i < times; i++) {
+		ZVAL_LONG(&params[0], i);
+		if (zend_call_function(&fci, &fci_cache) == FAILURE) {
+			return;
+		}
+		zval_ptr_dtor(&retval);
+	}
+}
+/* }}} */
+
 static void basic_globals_ctor(php_basic_globals *basic_globals_p) /* {{{ */
 {
 	memset(basic_globals_p, 0, sizeof(php_basic_globals));
