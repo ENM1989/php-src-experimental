@@ -34,6 +34,7 @@ Array
     [%d] => tiger160,4
     [%d] => tiger192,4
     [%d] => snefru
+    [%d] => snefru128
     [%d] => snefru256
     [%d] => gost
     [%d] => gost-crypto
