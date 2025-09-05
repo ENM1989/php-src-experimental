@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 6079be98e96354abb8558100e5a11dc2059b7806 */
+ * Stub hash: fc31f5f802176c8db73428661496dc3b7e4fe98c */
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_set_time_limit, 0, 1, _IS_BOOL, 0)
 	ZEND_ARG_TYPE_INFO(0, seconds, IS_LONG, 0)
@@ -1032,6 +1032,11 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_str_repeat, 0, 2, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, string, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, times, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_repeat, 0, 2, IS_VOID, 0)
+	ZEND_ARG_TYPE_INFO(0, times, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, action, IS_CALLABLE, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_count_chars, 0, 1, MAY_BE_ARRAY|MAY_BE_STRING)
@@ -2575,6 +2580,7 @@ ZEND_FUNCTION(setlocale);
 ZEND_FUNCTION(parse_str);
 ZEND_FUNCTION(str_getcsv);
 ZEND_FUNCTION(str_repeat);
+ZEND_FUNCTION(repeat);
 ZEND_FUNCTION(count_chars);
 ZEND_FUNCTION(strnatcmp);
 ZEND_FUNCTION(localeconv);
@@ -3177,6 +3183,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(parse_str, arginfo_parse_str)
 	ZEND_FE(str_getcsv, arginfo_str_getcsv)
 	ZEND_FE(str_repeat, arginfo_str_repeat)
+	ZEND_FE(repeat, arginfo_repeat)
 	ZEND_RAW_FENTRY("count_chars", zif_count_chars, arginfo_count_chars, ZEND_ACC_COMPILE_TIME_EVAL, NULL, NULL)
 	ZEND_FE(strnatcmp, arginfo_strnatcmp)
 	ZEND_FE(localeconv, arginfo_localeconv)

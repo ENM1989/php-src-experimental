@@ -2580,6 +2580,8 @@ function str_getcsv(string $string, string $separator = ",", string $enclosure =
 /** @refcount 1 */
 function str_repeat(string $string, int $times): string {}
 
+function repeat(int $times, callable $action): void {}
+
 /**
  * @return array<int, int>|string
  * @compile-time-eval
