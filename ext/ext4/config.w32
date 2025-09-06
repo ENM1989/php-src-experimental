@@ -1,0 +1,7 @@
+ARG_ENABLE('ext4', 'ext4 support', 'no');
+
+if (PHP_EXT4 != 'no') {
+	AC_DEFINE('HAVE_EXT4', 1, "Define to 1 if the PHP extension 'ext4' is available.");
+
+	EXTENSION('ext4', 'ext4.c', null, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
+}
