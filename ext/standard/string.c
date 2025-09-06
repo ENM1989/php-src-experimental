@@ -5122,17 +5122,16 @@ PHPAPI size_t php_strip_tags(char *rbuf, size_t len, const char *allow, size_t a
 PHPAPI size_t php_strip_tags_ex(char *rbuf, size_t len, const char *allow, size_t allow_len, bool allow_tag_spaces)
 {
 	char *tbuf, *tp, *rp, c, lc;
-	const char *buf, *p, *end;
+	const char *p, *end;
 	int br, depth=0, in_q = 0;
 	uint8_t state = 0;
 	size_t pos;
 	char *allow_free = NULL;
 	char is_xml = 0;
 
-	buf = estrndup(rbuf, len);
-	end = buf + len;
+	end = rbuf + len;
 	lc = '\0';
-	p = buf;
+	p = rbuf;
 	rp = rbuf;
 	br = 0;
 	if (allow) {
@@ -5218,7 +5217,7 @@ state_1:
 			}
 
 			lc = '>';
-			if (is_xml && p >= buf + 1 && *(p -1) == '-') {
+			if (is_xml && p >= rbuf + 1 && *(p -1) == '-') {
 				break;
 			}
 			in_q = state = is_xml = 0;
@@ -5239,7 +5238,7 @@ state_1:
 			goto state_0;
 		case '"':
 		case '\'':
-			if (p != buf && (!in_q || *p == in_q)) {
+			if (p != rbuf && (!in_q || *p == in_q)) {
 				if (in_q) {
 					in_q = 0;
 				} else {
@@ -5249,7 +5248,7 @@ state_1:
 			goto reg_char_1;
 		case '!':
 			/* JavaScript & Other HTML scripting languages */
-			if (p >= buf + 1 && *(p-1) == '<') {
+			if (p >= rbuf + 1 && *(p-1) == '<') {
 				state = 3;
 				lc = c;
 				p++;
@@ -5259,7 +5258,7 @@ state_1:
 			}
 			break;
 		case '?':
-			if (p >= buf + 1 && *(p-1) == '<') {
+			if (p >= rbuf + 1 && *(p-1) == '<') {
 				br=0;
 				state = 2;
 				p++;
@@ -5310,7 +5309,7 @@ state_2:
 				break;
 			}
 
-			if (!br && p >= buf + 1 && lc != '\"' && *(p-1) == '?') {
+			if (!br && p >= rbuf + 1 && lc != '\"' && *(p-1) == '?') {
 				in_q = state = 0;
 				tp = tbuf;
 				p++;
@@ -5319,13 +5318,13 @@ state_2:
 			break;
 		case '"':
 		case '\'':
-			if (p >= buf + 1 && *(p-1) != '\\') {
+			if (p >= rbuf + 1 && *(p-1) != '\\') {
 				if (lc == c) {
 					lc = '\0';
 				} else if (lc != '\\') {
 					lc = c;
 				}
-				if (p != buf && (!in_q || *p == in_q)) {
+				if (p != rbuf && (!in_q || *p == in_q)) {
 					if (in_q) {
 						in_q = 0;
 					} else {
@@ -5339,7 +5338,7 @@ state_2:
 			/* swm: If we encounter '<?xml' then we shouldn't be in
 			 * state == 2 (PHP). Switch back to HTML.
 			 */
-			if (state == 2 && p > buf+4
+			if (state == 2 && p > rbuf+4
 				     && (*(p-1) == 'm' || *(p-1) == 'M')
 				     && (*(p-2) == 'x' || *(p-2) == 'X')
 				     && *(p-3) == '?'
@@ -5375,7 +5374,7 @@ state_3:
 			goto state_0;
 		case '"':
 		case '\'':
-			if (p != buf && *(p-1) != '\\' && (!in_q || *p == in_q)) {
+			if (p != rbuf && *(p-1) != '\\' && (!in_q || *p == in_q)) {
 				if (in_q) {
 					in_q = 0;
 				} else {
@@ -5384,7 +5383,7 @@ state_3:
 			}
 			break;
 		case '-':
-			if (p >= buf + 2 && *(p-1) == '-' && *(p-2) == '!') {
+			if (p >= rbuf + 2 && *(p-1) == '-' && *(p-2) == '!') {
 				state = 4;
 				p++;
 				goto state_4;
@@ -5393,7 +5392,7 @@ state_3:
 		case 'E':
 		case 'e':
 			/* !DOCTYPE exception */
-			if (p > buf+6
+			if (p > rbuf+6
 			     && (*(p-1) == 'p' || *(p-1) == 'P')
 			     && (*(p-2) == 'y' || *(p-2) == 'Y')
 			     && (*(p-3) == 't' || *(p-3) == 'T')
@@ -5415,7 +5414,7 @@ state_4:
 	while (p < end) {
 		c = *p;
 		if (c == '>' && !in_q) {
-			if (p >= buf + 2 && *(p-1) == '-' && *(p-2) == '-') {
+			if (p >= rbuf + 2 && *(p-1) == '-' && *(p-2) == '-') {
 				in_q = state = 0;
 				tp = tbuf;
 				p++;
@@ -5429,7 +5428,6 @@ finish:
 	if (rp < rbuf + len) {
 		*rp = '\0';
 	}
-	efree((void *)buf);
 	if (tbuf) {
 		efree(tbuf);
 	}
