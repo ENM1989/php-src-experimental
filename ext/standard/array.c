@@ -214,6 +214,12 @@ static zend_always_inline int php_array_key_compare_string_unstable_i(Bucket *f,
 }
 /* }}} */
 
+static zend_always_inline int php_array_key_compare_integer_unstable_i(Bucket *f, Bucket *s) /* {{{ */
+{
+	return (zend_long)f->h > (zend_long)s->h ? 1 : -1;
+}
+/* }}} */
+
 static int php_array_key_compare_string_natural_general(Bucket *f, Bucket *s, int fold_case) /* {{{ */
 {
 	const char *s1, *s2;
@@ -363,6 +369,7 @@ DEFINE_SORT_VARIANTS(key_compare);
 DEFINE_SORT_VARIANTS(key_compare_numeric);
 DEFINE_SORT_VARIANTS(key_compare_string_case);
 DEFINE_SORT_VARIANTS(key_compare_string);
+DEFINE_SORT_VARIANTS(key_compare_integer);
 DEFINE_SORT_VARIANTS(key_compare_string_locale);
 DEFINE_SORT_VARIANTS(data_compare);
 DEFINE_SORT_VARIANTS(data_compare_numeric);
@@ -380,6 +387,14 @@ static bucket_compare_func_t php_get_key_compare_func(zend_long sort_type, int r
 				return php_array_reverse_key_compare_numeric;
 			} else {
 				return php_array_key_compare_numeric;
+			}
+			break;
+
+		case PHP_SORT_INTEGER:
+			if (reverse) {
+				return php_array_reverse_key_compare_integer;
+			} else {
+				return php_array_key_compare_integer;
 			}
 			break;
 
@@ -597,6 +612,12 @@ PHP_FUNCTION(ksort)
 		Z_PARAM_OPTIONAL
 		Z_PARAM_LONG(sort_type)
 	ZEND_PARSE_PARAMETERS_END();
+
+	if ((sort_type == PHP_SORT_REGULAR || sort_type == PHP_SORT_NUMERIC) &&
+		zend_array_is_int_keyed(Z_ARRVAL_P(array))
+	) {
+		sort_type = PHP_SORT_INTEGER;
+	}
 
 	cmp = php_get_key_compare_func(sort_type, 0);
 
