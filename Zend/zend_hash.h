@@ -1523,6 +1523,8 @@ static zend_always_inline void *zend_hash_get_current_data_ptr_ex(const HashTabl
 	_h = _idx; \
 	_ptr = Z_PTR_P(_z);
 
+ZEND_API bool ZEND_FASTCALL zend_array_is_int_keyed(const zend_array *array);
+
 /* The following macros are useful to insert a sequence of new elements
  * of packed array. They may be used instead of series of
  * zend_hash_next_index_insert_new()

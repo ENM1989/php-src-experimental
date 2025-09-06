@@ -3379,6 +3379,23 @@ convert:
 	}
 }
 
+ZEND_API bool ZEND_FASTCALL zend_array_is_int_keyed(const zend_array *array)
+{
+	zend_string *key;
+
+	if (HT_IS_PACKED(array)) {
+		return 1;
+	}
+
+	ZEND_HASH_MAP_FOREACH_STR_KEY(array, key) {
+		if (key) {
+			return 0;
+		}
+	} ZEND_HASH_FOREACH_END();
+
+	return 1;
+}
+
 /* Takes a "proptable" hashtable (contains only string keys) and converts it to
  * a "symtable" (contains integer and non-numeric string keys).
  * If the proptable didn't need duplicating, its refcount is incremented.
