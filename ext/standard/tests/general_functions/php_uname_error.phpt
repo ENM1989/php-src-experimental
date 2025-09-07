@@ -23,4 +23,4 @@ try {
 --EXPECT--
 ValueError: php_uname(): Argument #1 ($mode) must be a single character
 ValueError: php_uname(): Argument #1 ($mode) must be a single character
-ValueError: php_uname(): Argument #1 ($mode) must be one of "a", "m", "n", "r", "s", or "v"
+ValueError: php_uname(): Argument #1 ($mode) must be one of "a", "m", "n", "r", "s", "v", or "A"

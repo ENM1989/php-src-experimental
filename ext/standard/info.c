@@ -648,7 +648,7 @@ static void php_get_windows_cpu(char *buf, size_t bufsize)
 #endif
 
 static inline bool php_is_valid_uname_mode(char mode) {
-	return mode == 'a' || mode == 'm' || mode == 'n' || mode == 'r' || mode == 's' || mode == 'v';
+	return mode == 'a' || mode == 'm' || mode == 'n' || mode == 'r' || mode == 's' || mode == 'v' || mode == 'A';
 }
 
 /* {{{ php_get_uname */
@@ -1323,11 +1323,20 @@ PHP_FUNCTION(php_uname)
 
 	char mode = *mode_str;
 	if (!php_is_valid_uname_mode(mode)) {
-		zend_argument_value_error(1, "must be one of \"a\", \"m\", \"n\", \"r\", \"s\", or \"v\"");
+		zend_argument_value_error(1, "must be one of \"a\", \"m\", \"n\", \"r\", \"s\", \"v\", or \"A\"");
 		RETURN_THROWS();
 	}
 
-	RETURN_STR(php_get_uname(mode));
+	if (mode == 'A') {
+		array_init(return_value);
+		add_assoc_str(return_value, "sysname", php_get_uname('s'));
+		add_assoc_str(return_value, "nodename", php_get_uname('n'));
+		add_assoc_str(return_value, "release", php_get_uname('r'));
+		add_assoc_str(return_value, "version", php_get_uname('v'));
+		add_assoc_str(return_value, "machine", php_get_uname('m'));
+	} else {
+		RETURN_STR(php_get_uname(mode));
+	}
 }
 
 /* }}} */
