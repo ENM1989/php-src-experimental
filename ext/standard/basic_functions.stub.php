@@ -2071,6 +2071,8 @@ function is_uploaded_file(string $filename): bool {}
 
 function move_uploaded_file(string $from, string $to): bool {}
 
+function php_grep(string $pattern, string $filename): array|false {}
+
 /**
  * @return array<int|string, bool|int|float|string|array|null>|false
  * @refcount 1

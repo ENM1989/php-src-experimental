@@ -388,6 +388,7 @@ dnl Setup extension sources
 dnl
 PHP_NEW_EXTENSION([standard], m4_normalize([
     array.c
+    grep.c
     assert.c
     base64.c
     basic_functions.c

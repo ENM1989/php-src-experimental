@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: fc31f5f802176c8db73428661496dc3b7e4fe98c */
+ * Stub hash: 852785b70a4f1036e61f96b5138d27d27d8f6e7a */
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_set_time_limit, 0, 1, _IS_BOOL, 0)
 	ZEND_ARG_TYPE_INFO(0, seconds, IS_LONG, 0)
@@ -583,6 +583,11 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_move_uploaded_file, 0, 2, _IS_BOOL, 0)
 	ZEND_ARG_TYPE_INFO(0, from, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, to, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_php_grep, 0, 2, MAY_BE_ARRAY|MAY_BE_FALSE)
+	ZEND_ARG_TYPE_INFO(0, pattern, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_MASK_EX(arginfo_parse_ini_file, 0, 1, MAY_BE_ARRAY|MAY_BE_FALSE)
@@ -2459,6 +2464,7 @@ ZEND_FUNCTION(register_tick_function);
 ZEND_FUNCTION(unregister_tick_function);
 ZEND_FUNCTION(is_uploaded_file);
 ZEND_FUNCTION(move_uploaded_file);
+ZEND_FUNCTION(php_grep);
 ZEND_FUNCTION(parse_ini_file);
 ZEND_FUNCTION(parse_ini_string);
 #if ZEND_DEBUG
@@ -3057,6 +3063,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(unregister_tick_function, arginfo_unregister_tick_function)
 	ZEND_FE(is_uploaded_file, arginfo_is_uploaded_file)
 	ZEND_FE(move_uploaded_file, arginfo_move_uploaded_file)
+	ZEND_FE(php_grep, arginfo_php_grep)
 	ZEND_FE(parse_ini_file, arginfo_parse_ini_file)
 	ZEND_RAW_FENTRY("parse_ini_string", zif_parse_ini_string, arginfo_parse_ini_string, ZEND_ACC_COMPILE_TIME_EVAL, NULL, NULL)
 #if ZEND_DEBUG
