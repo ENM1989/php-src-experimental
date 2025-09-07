@@ -40,6 +40,7 @@
 #include "ext/standard/php_dns.h"
 #include "ext/standard/php_uuencode.h"
 #include "ext/standard/crc32_x86.h"
+#include "php_grep.h"
 
 #ifdef PHP_WIN32
 #include "win32/php_win32_globals.h"
