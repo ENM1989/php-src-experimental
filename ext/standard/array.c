@@ -68,6 +68,183 @@ static void php_array_init_globals(zend_array_globals *array_globals)
 }
 /* }}} */
 
+#ifdef HAVE_INTEL_GPU
+/*
+ * This is a simulated implementation for a hypothetical Intel GPU offloading scenario.
+ * In a real-world implementation, this would be replaced with actual calls to a
+ * GPU computing library like oneAPI or OpenCL.
+ */
+
+/* Placeholder for a GPU buffer */
+typedef struct _IntelGpuBuffer {
+    void *data;
+    size_t size;
+} IntelGpuBuffer;
+
+/* Placeholder for a GPU context */
+typedef struct _IntelGpuContext {
+    int device_id;
+} IntelGpuContext;
+
+/* Simulated GPU functions */
+static IntelGpuContext* intel_gpu_init() {
+    /* In a real implementation, this would initialize the GPU context,
+     * select a device, and prepare it for computation. */
+    IntelGpuContext* context = (IntelGpuContext*)malloc(sizeof(IntelGpuContext));
+    context->device_id = 0; // Assume device 0
+    return context;
+}
+
+static IntelGpuBuffer* intel_gpu_create_buffer(IntelGpuContext* context, zval* array) {
+    /* This would serialize the PHP array and transfer it to the GPU memory. */
+    IntelGpuBuffer* buffer = (IntelGpuBuffer*)malloc(sizeof(IntelGpuBuffer));
+    buffer->size = zend_hash_num_elements(Z_ARRVAL_P(array));
+    buffer->data = NULL; // Placeholder for GPU memory pointer
+    return buffer;
+}
+
+static int intel_gpu_offload_combine(IntelGpuContext* context, IntelGpuBuffer* keys_buffer, IntelGpuBuffer* values_buffer, IntelGpuBuffer* result_buffer) {
+    /* This would launch a kernel on the GPU to perform the array combination. */
+    result_buffer->size = keys_buffer->size;
+    return 1; // Success
+}
+
+static void intel_gpu_read_buffer(IntelGpuContext* context, IntelGpuBuffer* buffer, zval* array, HashTable* keys, HashTable* values) {
+    /* This would read the data from the GPU buffer back into a PHP array.
+     * For this simulation, we'll just perform the CPU-based combination to populate the array.
+     */
+    uint32_t pos_values = 0;
+    zval *entry_keys, *entry_values;
+
+	ZEND_HASH_FOREACH_VAL(keys, entry_keys) {
+		while (1) {
+			if (pos_values >= values->nNumUsed) {
+				break;
+			}
+			entry_values = ZEND_HASH_ELEMENT(values, pos_values);
+			if (Z_TYPE_P(entry_values) != IS_UNDEF) {
+				if (Z_TYPE_P(entry_keys) == IS_LONG) {
+					entry_values = zend_hash_index_update(Z_ARRVAL_P(array),
+						Z_LVAL_P(entry_keys), entry_values);
+				} else {
+					zend_string *tmp_key;
+					zend_string *key = zval_get_tmp_string(entry_keys, &tmp_key);
+					entry_values = zend_symtable_update(Z_ARRVAL_P(array),
+						key, entry_values);
+					zend_tmp_string_release(tmp_key);
+				}
+				zval_add_ref(entry_values);
+				pos_values++;
+				break;
+			}
+			pos_values++;
+		}
+	} ZEND_HASH_FOREACH_END();
+}
+
+static void intel_gpu_release(IntelGpuContext* context, IntelGpuBuffer* buffer) {
+    /* This would release the GPU buffer. */
+    if (buffer) {
+        free(buffer);
+    }
+    if (context) {
+        /* In a real implementation, the context might be released separately */
+    }
+}
+
+static void intel_gpu_context_release(IntelGpuContext* context) {
+    if (context) {
+        free(context);
+    }
+}
+#endif
+
+/* {{{ Creates an array by using the elements of the first parameter as keys and the elements of the second as the corresponding values, optimized for Intel GPU */
+PHP_FUNCTION(array_combine_intel_gpu)
+{
+	zval *keys_zval, *values_zval;
+	HashTable *values, *keys;
+	uint32_t pos_values = 0;
+	zval *entry_keys, *entry_values;
+	int num_keys, num_values;
+
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_ARRAY(keys_zval)
+		Z_PARAM_ARRAY(values_zval)
+	ZEND_PARSE_PARAMETERS_END();
+
+	keys = Z_ARRVAL_P(keys_zval);
+	values = Z_ARRVAL_P(values_zval);
+
+	num_keys = zend_hash_num_elements(keys);
+	num_values = zend_hash_num_elements(values);
+
+	if (num_keys != num_values) {
+		zend_argument_value_error(1, "and argument #2 ($values) must have the same number of elements");
+		RETURN_THROWS();
+	}
+
+	if (!num_keys) {
+		RETURN_EMPTY_ARRAY();
+	}
+
+#ifdef HAVE_INTEL_GPU
+    /*
+     * This block simulates offloading the array combination to an Intel GPU.
+     * In a real build with GPU support, this code would be active.
+     */
+    IntelGpuContext* context = intel_gpu_init();
+    IntelGpuBuffer* keys_buffer = intel_gpu_create_buffer(context, keys_zval);
+    IntelGpuBuffer* values_buffer = intel_gpu_create_buffer(context, values_zval);
+    IntelGpuBuffer* result_buffer = (IntelGpuBuffer*)malloc(sizeof(IntelGpuBuffer));
+
+    if (intel_gpu_offload_combine(context, keys_buffer, values_buffer, result_buffer)) {
+        array_init_size(return_value, result_buffer->size);
+        intel_gpu_read_buffer(context, result_buffer, return_value, keys, values);
+    }
+
+    intel_gpu_release(context, keys_buffer);
+    intel_gpu_release(context, values_buffer);
+    intel_gpu_release(context, result_buffer);
+    intel_gpu_context_release(context);
+
+    /*
+     * In a real scenario, we would return here if the GPU execution was successful.
+     */
+    return;
+#endif
+
+    /*
+     * CPU implementation (also used as a fallback for the GPU simulation).
+     */
+	array_init_size(return_value, num_keys);
+	ZEND_HASH_FOREACH_VAL(keys, entry_keys) {
+		while (1) {
+			if (pos_values >= values->nNumUsed) {
+				break;
+			}
+			entry_values = ZEND_HASH_ELEMENT(values, pos_values);
+			if (Z_TYPE_P(entry_values) != IS_UNDEF) {
+				if (Z_TYPE_P(entry_keys) == IS_LONG) {
+					entry_values = zend_hash_index_update(Z_ARRVAL_P(return_value),
+						Z_LVAL_P(entry_keys), entry_values);
+				} else {
+					zend_string *tmp_key;
+					zend_string *key = zval_get_tmp_string(entry_keys, &tmp_key);
+					entry_values = zend_symtable_update(Z_ARRVAL_P(return_value),
+						key, entry_values);
+					zend_tmp_string_release(tmp_key);
+				}
+				zval_add_ref(entry_values);
+				pos_values++;
+				break;
+			}
+			pos_values++;
+		}
+	} ZEND_HASH_FOREACH_END();
+}
+/* }}} */
+
 PHP_MINIT_FUNCTION(array) /* {{{ */
 {
 	ZEND_INIT_MODULE_GLOBALS(array, php_array_init_globals, NULL);

@@ -30,6 +30,7 @@ PHPAPI int php_array_merge_recursive(HashTable *dest, HashTable *src);
 PHPAPI int php_array_replace_recursive(HashTable *dest, HashTable *src);
 PHPAPI int php_multisort_compare(const void *a, const void *b);
 PHPAPI zend_long php_count_recursive(HashTable *ht);
+PHP_FUNCTION(array_combine_intel_gpu);
 
 PHPAPI bool php_array_data_shuffle(php_random_algo_with_state engine, zval *array);
 PHPAPI bool php_array_pick_keys(php_random_algo_with_state engine, zval *input, zend_long num_req, zval *retval, bool silent);

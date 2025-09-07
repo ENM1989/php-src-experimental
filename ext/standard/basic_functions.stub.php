@@ -1917,6 +1917,11 @@ function array_chunk(array $array, int $length, bool $preserve_keys = false): ar
  */
 function array_combine(array $keys, array $values): array {}
 
+/**
+ * @compile-time-eval
+ */
+function array_combine_intel_gpu(array $keys, array $values): array {}
+
 /** @compile-time-eval */
 function array_is_list(array $array): bool {}
 
