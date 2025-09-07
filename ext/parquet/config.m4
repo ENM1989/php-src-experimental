@@ -1,0 +1,6 @@
+PHP_NEW_EXTENSION([parquet], m4_normalize([
+    parquet.c
+  ]),
+  [no],,
+  [-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1])
+PHP_ADD_MAKEFILE_FRAGMENT

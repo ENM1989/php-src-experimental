@@ -1,0 +1,8 @@
+// vim:ft=javascript
+
+EXTENSION('parquet', 'parquet.c', false /* never shared */, "/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1");
+PHP_PARQUET="yes";
+
+ADD_MAKEFILE_FRAGMENT();
+
+PHP_INSTALL_HEADERS("ext/parquet", "php_parquet.h");
