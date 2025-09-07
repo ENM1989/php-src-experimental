@@ -174,3 +174,7 @@ class UnhandledMatchError extends Error
 class RequestParseBodyException extends Exception
 {
 }
+
+class TeapotException extends Exception
+{
+}
