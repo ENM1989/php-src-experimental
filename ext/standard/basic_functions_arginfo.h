@@ -2997,6 +2997,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_RAW_FENTRY("key_exists", zif_array_key_exists, arginfo_key_exists, 0, NULL, NULL)
 	ZEND_RAW_FENTRY("array_chunk", zif_array_chunk, arginfo_array_chunk, ZEND_ACC_COMPILE_TIME_EVAL, NULL, NULL)
 	ZEND_RAW_FENTRY("array_combine", zif_array_combine, arginfo_array_combine, ZEND_ACC_COMPILE_TIME_EVAL, NULL, NULL)
+	ZEND_RAW_FENTRY("array_combine_intel_gpu", zif_array_combine_intel_gpu, arginfo_array_combine, ZEND_ACC_COMPILE_TIME_EVAL, NULL, NULL)
 	ZEND_RAW_FENTRY("array_is_list", zif_array_is_list, arginfo_array_is_list, ZEND_ACC_COMPILE_TIME_EVAL, NULL, NULL)
 	ZEND_RAW_FENTRY("base64_encode", zif_base64_encode, arginfo_base64_encode, ZEND_ACC_COMPILE_TIME_EVAL, NULL, NULL)
 	ZEND_RAW_FENTRY("base64_decode", zif_base64_decode, arginfo_base64_decode, ZEND_ACC_COMPILE_TIME_EVAL, NULL, NULL)
