@@ -1,0 +1,7 @@
+ARG_ENABLE('elephant', 'elephant support', 'no');
+
+if (PHP_ELEPHANT != 'no') {
+	AC_DEFINE('HAVE_ELEPHANT', 1, "Define to 1 if the PHP extension 'elephant' is available.");
+
+	EXTENSION('elephant', 'elephant.c', null, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
+}
