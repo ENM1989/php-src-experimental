@@ -2107,6 +2107,8 @@ function config_get_hash(): array {}
 function sys_getloadavg(): array|false {}
 #endif
 
+function convert_metric(float $value, string $from, string $to): float {}
+
 /* browscap.c */
 
 /**
