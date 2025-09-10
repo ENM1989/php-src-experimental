@@ -216,6 +216,91 @@ static void php_putenv_destructor(zval *zv) /* {{{ */
 /* }}} */
 #endif
 
+typedef struct {
+    const char *unit;
+    double factor;
+    char type;
+} metric_unit;
+
+static const metric_unit units[] = {
+    {"kg", 1000, 'g'},
+    {"hg", 100, 'g'},
+    {"dag", 10, 'g'},
+    {"g", 1, 'g'},
+    {"dg", 0.1, 'g'},
+    {"cg", 0.01, 'g'},
+    {"mg", 0.001, 'g'},
+
+    {"km", 1000, 'm'},
+    {"hm", 100, 'm'},
+    {"dam", 10, 'm'},
+    {"m", 1, 'm'},
+    {"dm", 0.1, 'm'},
+    {"cm", 0.01, 'm'},
+    {"mm", 0.001, 'm'},
+
+    {"kl", 1000, 'l'},
+    {"hl", 100, 'l'},
+    {"dal", 10, 'l'},
+    {"l", 1, 'l'},
+    {"dl", 0.1, 'l'},
+    {"cl", 0.01, 'l'},
+    {"ml", 0.001, 'l'},
+
+    {NULL, 0, '\0'}
+};
+
+static double get_factor(const char *unit_str, char *unit_type) {
+    for (int i = 0; units[i].unit != NULL; i++) {
+        if (strcmp(units[i].unit, unit_str) == 0) {
+            *unit_type = units[i].type;
+            return units[i].factor;
+        }
+    }
+    *unit_type = '\0';
+    return 0.0;
+}
+
+PHP_FUNCTION(convert_metric)
+{
+    double value;
+    zend_string *from_str, *to_str;
+
+    ZEND_PARSE_PARAMETERS_START(3, 3)
+        Z_PARAM_DOUBLE(value)
+        Z_PARAM_STR(from_str)
+        Z_PARAM_STR(to_str)
+    ZEND_PARSE_PARAMETERS_END();
+
+    char from_type, to_type;
+    double from_factor, to_factor;
+
+    from_factor = get_factor(ZSTR_VAL(from_str), &from_type);
+    to_factor = get_factor(ZSTR_VAL(to_str), &to_type);
+
+    if (from_type == '\0') {
+        zend_argument_value_error(2, "is not a valid metric unit");
+        RETURN_THROWS();
+    }
+    if (to_type == '\0') {
+        zend_argument_value_error(3, "is not a valid metric unit");
+        RETURN_THROWS();
+    }
+    if (from_type != to_type) {
+        zend_argument_value_error(2, "and argument #3 ($to) must be of the same metric type (mass, length, or volume)");
+        RETURN_THROWS();
+    }
+
+    if (to_factor == 0.0) {
+		zend_throw_exception(zend_ce_division_by_zero_error, "Cannot divide by zero", 0);
+		RETURN_THROWS();
+    }
+
+    double result = value * from_factor / to_factor;
+
+    RETURN_DOUBLE(result);
+}
+
 /* {{{ Repeats a function N times */
 PHP_FUNCTION(repeat)
 {
