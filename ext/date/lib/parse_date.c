@@ -24910,11 +24910,11 @@ timelib_time *timelib_strtotime(const char *s, size_t len, timelib_error_contain
 
 	/* do funky checking whether the parsed time was valid time */
 	if (in.time->have_time && !timelib_valid_time( in.time->h, in.time->i, in.time->s)) {
-		add_warning(&in, TIMELIB_WARN_INVALID_TIME, "The parsed time was invalid");
+		add_error(&in, TIMELIB_WARN_INVALID_TIME, "The parsed time was invalid");
 	}
 	/* do funky checking whether the parsed date was valid date */
 	if (in.time->have_date && !timelib_valid_date( in.time->y, in.time->m, in.time->d)) {
-		add_warning(&in, TIMELIB_WARN_INVALID_DATE, "The parsed date was invalid");
+		add_error(&in, TIMELIB_WARN_INVALID_DATE, "The parsed date was invalid");
 	}
 
 	timelib_free(in.str);
@@ -25509,13 +25509,13 @@ timelib_time *timelib_parse_from_format_with_map(const char *format, const char 
 	if (s->time->h != TIMELIB_UNSET && s->time->i != TIMELIB_UNSET &&
 		s->time->s != TIMELIB_UNSET &&
 		!timelib_valid_time( s->time->h, s->time->i, s->time->s)) {
-		add_pbf_warning(s, TIMELIB_WARN_INVALID_TIME, "The parsed time was invalid", string, ptr);
+		add_pbf_error(s, TIMELIB_WARN_INVALID_TIME, "The parsed time was invalid", string, ptr);
 	}
 	/* do funky checking whether the parsed date was valid date */
 	if (s->time->y != TIMELIB_UNSET && s->time->m != TIMELIB_UNSET &&
 		s->time->d != TIMELIB_UNSET &&
 		!timelib_valid_date( s->time->y, s->time->m, s->time->d)) {
-		add_pbf_warning(s, TIMELIB_WARN_INVALID_DATE, "The parsed date was invalid", string, ptr);
+		add_pbf_error(s, TIMELIB_WARN_INVALID_DATE, "The parsed date was invalid", string, ptr);
 	}
 
 	if (errors) {
