@@ -257,6 +257,7 @@ try_again:
 				zend_string_release_ex(str, 0);
 				break;
 			}
+		case IS_TINYINT:
 		case IS_NULL:
 		case IS_FALSE:
 			ZVAL_LONG(op, 0);
@@ -292,6 +293,7 @@ try_again:
 static zend_never_inline zval* ZEND_FASTCALL _zendi_convert_scalar_to_number_silent(zval *op, zval *holder) /* {{{ */
 {
 	switch (Z_TYPE_P(op)) {
+		case IS_TINYINT:
 		case IS_NULL:
 		case IS_FALSE:
 			ZVAL_LONG(holder, 0);
@@ -325,6 +327,7 @@ static zend_never_inline zval* ZEND_FASTCALL _zendi_convert_scalar_to_number_sil
 static zend_never_inline zend_result ZEND_FASTCALL _zendi_try_convert_scalar_to_number(zval *op, zval *holder) /* {{{ */
 {
 	switch (Z_TYPE_P(op)) {
+		case IS_TINYINT:
 		case IS_NULL:
 		case IS_FALSE:
 			ZVAL_LONG(holder, 0);
@@ -380,6 +383,7 @@ static zend_never_inline zend_long ZEND_FASTCALL zendi_try_get_long(const zval *
 	*failed = 0;
 try_again:
 	switch (Z_TYPE_P(op)) {
+		case IS_TINYINT:
 		case IS_NULL:
 		case IS_FALSE:
 			return 0;
@@ -557,6 +561,7 @@ ZEND_API void ZEND_FASTCALL convert_to_long(zval *op) /* {{{ */
 
 try_again:
 	switch (Z_TYPE_P(op)) {
+		case IS_TINYINT:
 		case IS_NULL:
 		case IS_FALSE:
 			ZVAL_LONG(op, 0);
@@ -614,6 +619,7 @@ ZEND_API void ZEND_FASTCALL convert_to_double(zval *op) /* {{{ */
 
 try_again:
 	switch (Z_TYPE_P(op)) {
+		case IS_TINYINT:
 		case IS_NULL:
 		case IS_FALSE:
 			ZVAL_DOUBLE(op, 0.0);
@@ -693,6 +699,7 @@ try_again:
 				ZVAL_BOOL(op, l);
 			}
 			break;
+		case IS_TINYINT:
 		case IS_LONG:
 			ZVAL_BOOL(op, Z_LVAL_P(op) ? 1 : 0);
 			break;
@@ -760,6 +767,7 @@ try_again:
 			ZVAL_NEW_STR(op, str);
 			break;
 		}
+		case IS_TINYINT:
 		case IS_LONG:
 			ZVAL_STR(op, zend_long_to_str(Z_LVAL_P(op)));
 			break;
@@ -924,6 +932,7 @@ try_again:
 			return 1;
 		case IS_RESOURCE:
 			return Z_RES_HANDLE_P(op);
+		case IS_TINYINT:
 		case IS_LONG:
 			return Z_LVAL_P(op);
 		case IS_DOUBLE: {
@@ -993,6 +1002,7 @@ try_again:
 			return 1.0;
 		case IS_RESOURCE:
 			return (double) Z_RES_HANDLE_P(op);
+		case IS_TINYINT:
 		case IS_LONG:
 			return (double) Z_LVAL_P(op);
 		case IS_DOUBLE:
@@ -1033,6 +1043,7 @@ try_again:
 			return ZSTR_CHAR('1');
 		case IS_RESOURCE:
 			return zend_strpprintf(0, "Resource id #" ZEND_LONG_FMT, (zend_long)Z_RES_HANDLE_P(op));
+		case IS_TINYINT:
 		case IS_LONG:
 			return zend_long_to_str(Z_LVAL_P(op));
 		case IS_DOUBLE:
@@ -1103,16 +1114,16 @@ static zend_always_inline zend_result add_function_fast(zval *result, zval *op1,
 {
 	uint8_t type_pair = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2));
 
-	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG))) {
+	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_LONG))) {
 		fast_long_add_function(result, op1, op2);
 		return SUCCESS;
 	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE))) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1) + Z_DVAL_P(op2));
 		return SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_DOUBLE))) {
 		ZVAL_DOUBLE(result, ((double)Z_LVAL_P(op1)) + Z_DVAL_P(op2));
 		return SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_TINYINT))) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1) + ((double)Z_LVAL_P(op2)));
 		return SUCCESS;
 	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_ARRAY, IS_ARRAY))) {
@@ -1169,16 +1180,16 @@ static zend_always_inline zend_result sub_function_fast(zval *result, zval *op1,
 {
 	uint8_t type_pair = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2));
 
-	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG))) {
+	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_LONG))) {
 		fast_long_sub_function(result, op1, op2);
 		return SUCCESS;
 	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE))) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1) - Z_DVAL_P(op2));
 		return SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_DOUBLE))) {
 		ZVAL_DOUBLE(result, ((double)Z_LVAL_P(op1)) - Z_DVAL_P(op2));
 		return SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_TINYINT))) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1) - ((double)Z_LVAL_P(op2)));
 		return SUCCESS;
 	} else {
@@ -1234,7 +1245,7 @@ static zend_always_inline zend_result mul_function_fast(zval *result, zval *op1,
 {
 	uint8_t type_pair = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2));
 
-	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG))) {
+	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_LONG))) {
 		zend_long overflow;
 		ZEND_SIGNED_MULTIPLY_LONG(
 			Z_LVAL_P(op1), Z_LVAL_P(op2),
@@ -1244,10 +1255,10 @@ static zend_always_inline zend_result mul_function_fast(zval *result, zval *op1,
 	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE))) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1) * Z_DVAL_P(op2));
 		return SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_DOUBLE))) {
 		ZVAL_DOUBLE(result, ((double)Z_LVAL_P(op1)) * Z_DVAL_P(op2));
 		return SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_TINYINT))) {
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1) * ((double)Z_LVAL_P(op2)));
 		return SUCCESS;
 	} else {
@@ -1317,7 +1328,7 @@ static zend_result ZEND_FASTCALL pow_function_base(zval *result, zval *op1, zval
 {
 	uint8_t type_pair = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2));
 
-	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG))) {
+	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_LONG))) {
 		if (Z_LVAL_P(op2) >= 0) {
 			zend_long l1 = 1, l2 = Z_LVAL_P(op1), i = Z_LVAL_P(op2);
 
@@ -1358,10 +1369,10 @@ static zend_result ZEND_FASTCALL pow_function_base(zval *result, zval *op1, zval
 	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_DOUBLE))) {
 		ZVAL_DOUBLE(result, safe_pow(Z_DVAL_P(op1), Z_DVAL_P(op2)));
 		return SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_DOUBLE))) {
 		ZVAL_DOUBLE(result, safe_pow((double)Z_LVAL_P(op1), Z_DVAL_P(op2)));
 		return SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_TINYINT))) {
 		ZVAL_DOUBLE(result, safe_pow(Z_DVAL_P(op1), (double)Z_LVAL_P(op2)));
 		return SUCCESS;
 	} else {
@@ -1413,7 +1424,7 @@ static zend_div_status ZEND_FASTCALL div_function_base(zval *result, const zval 
 {
 	uint8_t type_pair = TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2));
 
-	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG))) {
+	if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_TINYINT)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_LONG))) {
 		if (Z_LVAL_P(op2) == 0) {
 			return DIV_BY_ZERO;
 		} else if (Z_LVAL_P(op2) == -1 && Z_LVAL_P(op1) == ZEND_LONG_MIN) {
@@ -1433,13 +1444,13 @@ static zend_div_status ZEND_FASTCALL div_function_base(zval *result, const zval 
 		}
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1) / Z_DVAL_P(op2));
 		return DIV_SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_LONG)) || EXPECTED(type_pair == TYPE_PAIR(IS_DOUBLE, IS_TINYINT))) {
 		if (Z_LVAL_P(op2) == 0) {
 			return DIV_BY_ZERO;
 		}
 		ZVAL_DOUBLE(result, Z_DVAL_P(op1) / (double)Z_LVAL_P(op2));
 		return DIV_SUCCESS;
-	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE))) {
+	} else if (EXPECTED(type_pair == TYPE_PAIR(IS_LONG, IS_DOUBLE)) || EXPECTED(type_pair == TYPE_PAIR(IS_TINYINT, IS_DOUBLE))) {
 		if (Z_DVAL_P(op2) == 0) {
 			return DIV_BY_ZERO;
 		}
@@ -1609,6 +1620,7 @@ ZEND_API zend_result ZEND_FASTCALL bitwise_not_function(zval *result, zval *op1)
 {
 try_again:
 	switch (Z_TYPE_P(op1)) {
+		case IS_TINYINT:
 		case IS_LONG:
 			ZVAL_LONG(result, ~Z_LVAL_P(op1));
 			return SUCCESS;
@@ -1660,7 +1672,7 @@ ZEND_API zend_result ZEND_FASTCALL bitwise_or_function(zval *result, zval *op1, 
 {
 	zend_long op1_lval, op2_lval;
 
-	if (EXPECTED(Z_TYPE_P(op1) == IS_LONG) && EXPECTED(Z_TYPE_P(op2) == IS_LONG)) {
+	if ((EXPECTED(Z_TYPE_P(op1) == IS_LONG) || EXPECTED(Z_TYPE_P(op1) == IS_TINYINT)) && (EXPECTED(Z_TYPE_P(op2) == IS_LONG) || EXPECTED(Z_TYPE_P(op2) == IS_TINYINT))) {
 		ZVAL_LONG(result, Z_LVAL_P(op1) | Z_LVAL_P(op2));
 		return SUCCESS;
 	}
@@ -1742,7 +1754,7 @@ ZEND_API zend_result ZEND_FASTCALL bitwise_and_function(zval *result, zval *op1,
 {
 	zend_long op1_lval, op2_lval;
 
-	if (EXPECTED(Z_TYPE_P(op1) == IS_LONG) && EXPECTED(Z_TYPE_P(op2) == IS_LONG)) {
+	if ((EXPECTED(Z_TYPE_P(op1) == IS_LONG) || EXPECTED(Z_TYPE_P(op1) == IS_TINYINT)) && (EXPECTED(Z_TYPE_P(op2) == IS_LONG) || EXPECTED(Z_TYPE_P(op2) == IS_TINYINT))) {
 		ZVAL_LONG(result, Z_LVAL_P(op1) & Z_LVAL_P(op2));
 		return SUCCESS;
 	}
@@ -1824,7 +1836,7 @@ ZEND_API zend_result ZEND_FASTCALL bitwise_xor_function(zval *result, zval *op1,
 {
 	zend_long op1_lval, op2_lval;
 
-	if (EXPECTED(Z_TYPE_P(op1) == IS_LONG) && EXPECTED(Z_TYPE_P(op2) == IS_LONG)) {
+	if ((EXPECTED(Z_TYPE_P(op1) == IS_LONG) || EXPECTED(Z_TYPE_P(op1) == IS_TINYINT)) && (EXPECTED(Z_TYPE_P(op2) == IS_LONG) || EXPECTED(Z_TYPE_P(op2) == IS_TINYINT))) {
 		ZVAL_LONG(result, Z_LVAL_P(op1) ^ Z_LVAL_P(op2));
 		return SUCCESS;
 	}
@@ -2270,12 +2282,17 @@ ZEND_API int ZEND_FASTCALL zend_compare(zval *op1, zval *op2) /* {{{ */
 	while (1) {
 		switch (TYPE_PAIR(Z_TYPE_P(op1), Z_TYPE_P(op2))) {
 			case TYPE_PAIR(IS_LONG, IS_LONG):
+			case TYPE_PAIR(IS_TINYINT, IS_TINYINT):
+			case TYPE_PAIR(IS_LONG, IS_TINYINT):
+			case TYPE_PAIR(IS_TINYINT, IS_LONG):
 				return Z_LVAL_P(op1)>Z_LVAL_P(op2)?1:(Z_LVAL_P(op1)<Z_LVAL_P(op2)?-1:0);
 
 			case TYPE_PAIR(IS_DOUBLE, IS_LONG):
+			case TYPE_PAIR(IS_DOUBLE, IS_TINYINT):
 				return ZEND_THREEWAY_COMPARE(Z_DVAL_P(op1), (double)Z_LVAL_P(op2));
 
 			case TYPE_PAIR(IS_LONG, IS_DOUBLE):
+			case TYPE_PAIR(IS_TINYINT, IS_DOUBLE):
 				return ZEND_THREEWAY_COMPARE((double)Z_LVAL_P(op1), Z_DVAL_P(op2));
 
 			case TYPE_PAIR(IS_DOUBLE, IS_DOUBLE):
@@ -2310,9 +2327,11 @@ ZEND_API int ZEND_FASTCALL zend_compare(zval *op1, zval *op2) /* {{{ */
 				return Z_STRLEN_P(op1) == 0 ? 0 : 1;
 
 			case TYPE_PAIR(IS_LONG, IS_STRING):
+			case TYPE_PAIR(IS_TINYINT, IS_STRING):
 				return compare_long_to_string(Z_LVAL_P(op1), Z_STR_P(op2));
 
 			case TYPE_PAIR(IS_STRING, IS_LONG):
+			case TYPE_PAIR(IS_STRING, IS_TINYINT):
 				return -compare_long_to_string(Z_LVAL_P(op2), Z_STR_P(op1));
 
 			case TYPE_PAIR(IS_DOUBLE, IS_STRING):
@@ -2425,6 +2444,7 @@ ZEND_API bool ZEND_FASTCALL zend_is_identical(const zval *op1, const zval *op2) 
 		case IS_FALSE:
 		case IS_TRUE:
 			return 1;
+		case IS_TINYINT:
 		case IS_LONG:
 			return (Z_LVAL_P(op1) == Z_LVAL_P(op2));
 		case IS_RESOURCE:
@@ -2658,6 +2678,7 @@ ZEND_API zend_result ZEND_FASTCALL increment_function(zval *op1) /* {{{ */
 {
 try_again:
 	switch (Z_TYPE_P(op1)) {
+		case IS_TINYINT:
 		case IS_LONG:
 			fast_long_increment_function(op1);
 			break;
@@ -2746,6 +2767,7 @@ ZEND_API zend_result ZEND_FASTCALL decrement_function(zval *op1) /* {{{ */
 
 try_again:
 	switch (Z_TYPE_P(op1)) {
+		case IS_TINYINT:
 		case IS_LONG:
 			fast_long_decrement_function(op1);
 			break;
