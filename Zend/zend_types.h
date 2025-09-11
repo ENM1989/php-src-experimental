@@ -629,25 +629,26 @@ struct _zend_ast_ref {
 #define IS_RESOURCE					9
 #define IS_REFERENCE				10
 #define IS_CONSTANT_AST				11 /* Constant expressions */
+#define IS_TINYINT					12
 
 /* Fake types used only for type hinting.
  * These are allowed to overlap with the types below. */
-#define IS_CALLABLE					12
-#define IS_ITERABLE					13
-#define IS_VOID						14
-#define IS_STATIC					15
-#define IS_MIXED					16
-#define IS_NEVER					17
+#define IS_CALLABLE					13
+#define IS_ITERABLE					14
+#define IS_VOID						15
+#define IS_STATIC					16
+#define IS_MIXED					17
+#define IS_NEVER					18
 
 /* internal types */
-#define IS_INDIRECT             	12
-#define IS_PTR						13
-#define IS_ALIAS_PTR				14
-#define _IS_ERROR					15
+#define IS_INDIRECT             	13
+#define IS_PTR						14
+#define IS_ALIAS_PTR				15
+#define _IS_ERROR					16
 
 /* used for casts */
-#define _IS_BOOL					18
-#define _IS_NUMBER					19
+#define _IS_BOOL					19
+#define _IS_NUMBER					20
 
 /* guard flags */
 #define ZEND_GUARD_PROPERTY_GET		(1<<0)
@@ -1102,6 +1103,15 @@ static zend_always_inline uint32_t zval_gc_info(uint32_t gc_type_info) {
 		zval *__z = (z);				\
 		Z_LVAL_P(__z) = l;				\
 		Z_TYPE_INFO_P(__z) = IS_LONG;	\
+	} while (0)
+
+#define Z_TINYINTVAL(z) Z_LVAL(z)
+#define Z_TINYINTVAL_P(z) Z_LVAL_P(z)
+
+#define ZVAL_TINYINT(z, l) do { \
+		zval *__z = (z); \
+		Z_LVAL_P(__z) = l; \
+		Z_TYPE_INFO_P(__z) = IS_TINYINT; \
 	} while (0)
 
 #define ZVAL_DOUBLE(z, d) do {			\
