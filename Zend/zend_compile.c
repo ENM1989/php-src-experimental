@@ -5286,6 +5286,13 @@ static bool zend_is_constructor(zend_string *name) /* {{{ */
 }
 /* }}} */
 
+static bool zend_is_destructor(zend_string *name) /* {{{ */
+{
+	return zend_string_equals_literal_ci(name, ZEND_DESTRUCTOR_FUNC_NAME) ||
+		zend_string_equals_literal_ci(name, "__des");
+}
+/* }}} */
+
 static zend_function *zend_get_compatible_func_or_null(zend_class_entry *ce, zend_string *lcname) /* {{{ */
 {
 	zend_function *fbc = zend_hash_find_ptr(&ce->function_table, lcname);

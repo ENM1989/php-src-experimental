@@ -2880,10 +2880,10 @@ ZEND_API void zend_add_magic_method(zend_class_entry *ce, zend_function *fptr, z
 		/* pass */
 	} else if (zend_string_equals_literal(lcname, ZEND_CLONE_FUNC_NAME)) {
 		ce->clone = fptr;
-	} else if (zend_string_equals_literal(lcname, ZEND_CONSTRUCTOR_FUNC_NAME)) {
+	} else if (zend_is_constructor(lcname)) {
 		ce->constructor = fptr;
 		ce->constructor->common.fn_flags |= ZEND_ACC_CTOR;
-	} else if (zend_string_equals_literal(lcname, ZEND_DESTRUCTOR_FUNC_NAME)) {
+	} else if (zend_is_destructor(lcname)) {
 		ce->destructor = fptr;
 	} else if (zend_string_equals_literal(lcname, ZEND_GET_FUNC_NAME)) {
 		ce->__get = fptr;
