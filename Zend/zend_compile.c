@@ -5281,7 +5281,8 @@ static void zend_compile_method_call(znode *result, zend_ast *ast, uint32_t type
 
 static bool zend_is_constructor(zend_string *name) /* {{{ */
 {
-	return zend_string_equals_literal_ci(name, ZEND_CONSTRUCTOR_FUNC_NAME);
+	return zend_string_equals_literal_ci(name, ZEND_CONSTRUCTOR_FUNC_NAME) ||
+		zend_string_equals_literal_ci(name, "__con");
 }
 /* }}} */
 
