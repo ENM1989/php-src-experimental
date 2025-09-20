@@ -139,6 +139,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %token <ident> T_CONTINUE      "'continue'"
 %token <ident> T_GOTO          "'goto'"
 %token <ident> T_FUNCTION      "'function'"
+%token <ident> T_FUN           "'fun'"
 %token <ident> T_FN            "'fn'"
 %token <ident> T_CONST         "'const'"
 %token <ident> T_RETURN        "'return'"
@@ -1407,6 +1408,7 @@ fn:
 
 function:
 	T_FUNCTION { $$ = CG(zend_lineno); }
+    |   T_FUN { $$ = CG(zend_lineno); }
 ;
 
 backup_doc_comment:
