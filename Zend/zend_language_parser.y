@@ -154,6 +154,7 @@ static YYSIZE_T zend_yytnamerr(char*, const char*);
 %token <ident> T_ABSTRACT      "'abstract'"
 %token <ident> T_FINAL         "'final'"
 %token <ident> T_PRIVATE       "'private'"
+%token <ident> T_PRI           "'pri'"
 %token <ident> T_PROTECTED     "'protected'"
 %token <ident> T_PUBLIC        "'public'"
 %token <ident> T_PRIVATE_SET   "'private(set)'"
@@ -1106,6 +1107,7 @@ member_modifier:
 		T_PUBLIC				{ $$ = T_PUBLIC; }
 	|	T_PROTECTED				{ $$ = T_PROTECTED; }
 	|	T_PRIVATE				{ $$ = T_PRIVATE; }
+	|	T_PRI					{ $$ = T_PRIVATE; }
 	|	T_PUBLIC_SET			{ $$ = T_PUBLIC_SET; }
 	|	T_PROTECTED_SET			{ $$ = T_PROTECTED_SET; }
 	|	T_PRIVATE_SET			{ $$ = T_PRIVATE_SET; }
