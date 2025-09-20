@@ -2784,10 +2784,10 @@ ZEND_API void zend_check_magic_method_implementation(const zend_class_entry *ce,
 		return;
 	}
 
-	if (zend_string_equals_literal(lcname, ZEND_CONSTRUCTOR_FUNC_NAME)) {
+	if (zend_is_constructor(lcname)) {
 		zend_check_magic_method_non_static(ce, fptr, error_type);
 		zend_check_magic_method_no_return_type(ce, fptr, error_type);
-	} else if (zend_string_equals_literal(lcname, ZEND_DESTRUCTOR_FUNC_NAME)) {
+	} else if (zend_string_equals_literal_ci(lcname, ZEND_DESTRUCTOR_FUNC_NAME) || zend_string_equals_literal_ci(lcname, "__des")) {
 		zend_check_magic_method_args(0, ce, fptr, error_type);
 		zend_check_magic_method_non_static(ce, fptr, error_type);
 		zend_check_magic_method_no_return_type(ce, fptr, error_type);
@@ -2883,7 +2883,7 @@ ZEND_API void zend_add_magic_method(zend_class_entry *ce, zend_function *fptr, z
 	} else if (zend_is_constructor(lcname)) {
 		ce->constructor = fptr;
 		ce->constructor->common.fn_flags |= ZEND_ACC_CTOR;
-	} else if (zend_is_destructor(lcname)) {
+	} else if (zend_string_equals_literal_ci(lcname, ZEND_DESTRUCTOR_FUNC_NAME) || zend_string_equals_literal_ci(lcname, "__des")) {
 		ce->destructor = fptr;
 	} else if (zend_string_equals_literal(lcname, ZEND_GET_FUNC_NAME)) {
 		ce->__get = fptr;
